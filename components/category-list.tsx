@@ -2,7 +2,20 @@
 
 import { useState, useEffect } from 'react';
 
-export default function CategoryList({ categories }) {
+// Define proper type for category
+interface Category {
+  title: string;
+  slug: {
+    current: string;
+  };
+  color?: string;
+}
+
+interface CategoryListProps {
+  categories: Category[];
+}
+
+export default function CategoryList({ categories }: CategoryListProps) {
   const [isMobile, setIsMobile] = useState(false);
   
   useEffect(() => {

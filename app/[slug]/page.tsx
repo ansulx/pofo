@@ -7,6 +7,26 @@ import { format, parseISO } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
 
+// Add type definitions for the Portable Text components
+interface PortableTextImageType {
+  _type: 'image';
+  asset: {
+    _ref: string;
+    _type: 'reference';
+  };
+  alt?: string;
+  caption?: string;
+}
+
+// Define other component types as needed
+interface PortableTextComponents {
+  types: {
+    image: React.ComponentType<{ value: PortableTextImageType }>;
+    // Add other custom types here
+  };
+  // Add marks, block styles, etc. if needed
+}
+
 // Ensure content is fresh
 export const dynamic = 'force-dynamic';
 
@@ -60,18 +80,18 @@ async function getPost(slug: string) {
 }
 
 // Define custom components for the PortableText renderer
-const components = {
+const components: PortableTextComponents = {
   types: {
-    image: ({ value }) => (
+    image: ({ value }: { value: PortableTextImageType }) => (
       <div className="my-8 aspect-[16/9] relative rounded-lg overflow-hidden">
         <Image
           src={urlFor(value).width(1200).quality(90).url()}
-          alt={value.alt || ''}
+          alt={value.alt || 'Blog post image'}
           fill
           className="object-cover"
         />
         {value.caption && (
-          <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-2 text-sm">
+          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm">
             {value.caption}
           </div>
         )}

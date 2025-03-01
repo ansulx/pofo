@@ -57,4 +57,12 @@ export interface WebVitalsMetric {
   startTime: number;
   value: number;
   label: 'web-vital' | 'custom';
+}
+
+export interface Category {
+  title: string;
+  slug: {
+    current: string;
+  };
+  color?: string;
 } 
