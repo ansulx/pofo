@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Project } from '@/types';
 import { useSanityListener } from '@/lib/hooks/useSanityListener';
+import { urlFor } from '@/sanity/config';
 
 interface ProjectsListProps {
   initialProjects: Project[];
@@ -15,6 +16,13 @@ export default function ProjectsList({ initialProjects }: ProjectsListProps) {
   const [projects, setProjects] = useState<Project[]>(initialProjects || []);
   const [activeTag, setActiveTag] = useState<string>('All');
   const [isLoading, setIsLoading] = useState(false);
+  const [activeProject, setActiveProject] = useState<number | null>(0);
+  const [windowWidth, setWindowWidth] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
   
   // Set up auto-refresh for projects with better caching
   useEffect(() => {
@@ -90,51 +98,86 @@ export default function ProjectsList({ initialProjects }: ProjectsListProps) {
     }
   });
 
+  // Fix dependency array warning by including 'projects'
+  useEffect(() => {
+    // Only run client-side
+    setWindowWidth(window.innerWidth);
+    
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Handle initial active project
+    if (projects.length > 0 && activeProject === null) {
+      setActiveProject(0);
+    }
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [projects, activeProject]); // Include projects in dependency array
+
+  const isMobile = windowWidth < 768;
+
+  // Disable parallax on mobile
+  const parallaxY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    isMobile ? [0, 0] : [0, 100]
+  );
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10 sm:py-14">
-      <div className="mb-10">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-          Projects
-        </h1>
-        <div className="w-14 h-1 bg-indigo-500 rounded mb-4"></div>
-        <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl">
-          Selected works and contributions to the academic community
-        </p>
-      </div>
+    <div 
+      ref={containerRef}
+      className="relative py-12 md:py-24"
+    >
+      <div className="max-w-6xl mx-auto px-4 py-10 sm:py-14">
+        <div className="mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+            Projects
+          </h1>
+          <div className="w-14 h-1 bg-indigo-500 rounded mb-4"></div>
+          <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl">
+            Selected works and contributions to the academic community
+          </p>
+        </div>
 
-      {/* Tags filter - more compact styling */}
-      {allTags.length > 1 && (
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-2">
-            {allTags.map(tag => (
-              <button
-                key={tag}
-                onClick={() => setActiveTag(tag)}
-                className={`px-3 py-1 text-xs rounded-full transition-colors ${
-                  activeTag === tag 
-                    ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 font-medium' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
+        {/* Tags filter - more compact styling */}
+        {allTags.length > 1 && (
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-2">
+              {allTags.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTag(tag)}
+                  className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                    activeTag === tag 
+                      ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 font-medium' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Projects grid - Two column on desktop, single column on mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProjects.map((project, index) => (
-          <ProjectItem key={project._id} project={project} index={index} />
-        ))}
-      </div>
-      
-      {filteredProjects.length === 0 && !isLoading && (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          No projects found in this category.
+        {/* Projects grid - Two column on desktop, single column on mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project, index) => (
+            <ProjectItem key={project._id} project={project} index={index} />
+          ))}
         </div>
-      )}
+        
+        {filteredProjects.length === 0 && !isLoading && (
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            No projects found in this category.
+          </div>
+        )}
+      </div>
     </div>
   );
 }

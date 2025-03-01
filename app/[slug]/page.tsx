@@ -18,13 +18,30 @@ interface PortableTextImageType {
   caption?: string;
 }
 
+// Add a type for code blocks
+interface PortableTextCodeType {
+  _type: 'code';
+  code: string;
+  language?: string;
+}
+
 // Define other component types as needed
 interface PortableTextComponents {
   types: {
     image: React.ComponentType<{ value: PortableTextImageType }>;
+    code: React.ComponentType<{ value: PortableTextCodeType }>;
     // Add other custom types here
   };
-  // Add marks, block styles, etc. if needed
+  marks: {
+    link: React.ComponentType<{ 
+      children: React.ReactNode; 
+      value: { 
+        href: string;
+        [key: string]: any;
+      }
+    }>;
+  };
+  // Add block styles if needed
 }
 
 // Ensure content is fresh
@@ -97,7 +114,7 @@ const components: PortableTextComponents = {
         )}
       </div>
     ),
-    code: ({ value }) => (
+    code: ({ value }: { value: PortableTextCodeType }) => (
       <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto my-6">
         <code className="text-sm font-mono text-gray-800 dark:text-gray-200">
           {value.code}

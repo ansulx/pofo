@@ -94,5 +94,18 @@ export function reportWebVitals(metric: NextWebVitalsMetric) {
     console.log(metric);
   }
   
-  // In production, you could send to an analytics endpoint
+  // In production, you could send to your analytics platform
+  if (process.env.NODE_ENV === 'production') {
+    // Example: send to a custom endpoint
+    const body = JSON.stringify(metric);
+    const url = '/api/analytics';
+
+    // Use `navigator.sendBeacon()` if available
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, body);
+    } else {
+      // Fall back to fetch
+      fetch(url, { body, method: 'POST', keepalive: true });
+    }
+  }
 }
