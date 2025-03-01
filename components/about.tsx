@@ -1,11 +1,17 @@
 "use client";
 
-import React from "react";
-import SectionHeading from "./section-heading";
 import { motion } from "framer-motion";
+import SectionHeading from "./section-heading";
 import { useSectionInView } from "@/lib/hooks";
+import Image from "next/image";
+import { Profile } from "@/types";
 
-export default function About() {
+interface AboutProps {
+  content: string;
+  about?: Profile | null;
+}
+
+export default function About({ content, about }: AboutProps) {
   const { ref } = useSectionInView("About");
 
   return (
@@ -15,41 +21,47 @@ export default function About() {
       initial={{ opacity: 0, y: 100 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.175 }}
-      id="about"
     >
       <SectionHeading>About me</SectionHeading>
-      <p className="mb-3">
-      After completing my education, {" "}
-        <span className="font-medium"> I pursued my passion for technology and programming.
-          </span>I dove into the world of software development and research, gaining 
-          professional experience in Blockchain and Machine Learning.{" "}
-        <span className="font-medium">I am particularly passionate about leveraging 
-          technology for social good, having led key research initiatives aimed 
-          at addressing agronomics and enhancing privacy and transparency in the supply 
-          chain.</span></p>
-          
-        <p>
-        <span className="italic"></span> My  <span className="underline">research interests</span> focus on 
-        improving system security, maintaining the integrity of 
-        technological architectures, and building efficient machine learning models. 
-        My core stack
-        includes{" "}
-        <span className="font-medium underline">
-        React, Next.js, Node.js, MongoDB, Python and PyTorch
-        </span>
-        , and I am also proficient in TypeScript and Prisma. I am always eager to learn 
-        new technologies and expand my skill set. Currently, I am seeking a {" "}
-        <span className="font-medium">full-time position</span> as a software
-        developer.
-      
-
-      
-        <span className="italic"> Outside of coding</span>, I enjoy playing video games
-        watching movies. 
-        I also enjoy{" "}
-        <span className="font-medium">reading</span> and have a keen interest{" "}
-        <span className="font-medium">in psycology and philosophy.</span>.
-      </p>
+      {about?.profileImage?.asset?.url && (
+        <div className="relative w-full max-w-[350px] h-[350px] rounded-xl overflow-hidden mx-auto mb-8 md:mb-0">
+          <Image
+            src={about.profileImage.asset.url}
+            alt={about?.name || "Profile picture"}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 350px"
+            priority
+            style={{ objectPosition: 'center top' }}
+          />
+        </div>
+      )}
+      <p className="mb-3">{content}</p>
+      {about?.cv?.asset?.url && (
+        <div className="mt-6 md:mt-8 text-center">
+          <a
+            href={about.cv.asset.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-md transition-colors shadow-sm"
+            download={`${about.name || 'CV'}.pdf`}
+          >
+            <svg 
+              className="w-4 h-4 mr-2" 
+              fill="currentColor" 
+              viewBox="0 0 20 20" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                fillRule="evenodd" 
+                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" 
+                clipRule="evenodd"
+              />
+            </svg>
+            {about.cvTitle || 'Download CV'}
+          </a>
+        </div>
+      )}
     </motion.section>
   );
 }

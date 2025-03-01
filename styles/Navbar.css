@@ -1,0 +1,22 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  background: transparent;  /* Makes it blend with background */
+  border: none;            /* Removes outline/boundary */
+  padding: 1rem;          /* Add some padding for spacing */
+  z-index: 1000;          /* Ensures navbar stays on top */
+}
+
+/* If you have list items in the navbar */
+.navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* For navbar links */
+.navbar a {
+  text-decoration: none;
+  color: inherit;
+} 
