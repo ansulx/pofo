@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { format, parseISO } from 'date-fns'
 import { urlFor } from '@/sanity/config'
 import { BlogPost } from '@/types'
+import CategoryList from '@/components/category-list'
 
 export const metadata: Metadata = {
   title: "Ansul Porwal | Blog & Portfolio",
@@ -195,25 +196,7 @@ export default async function HomePage() {
                               )}
                               
                               {post.categories?.length > 0 && (
-                                <div className="flex flex-wrap gap-1 sm:gap-2">
-                                  {post.categories.slice(0, window.innerWidth < 640 ? 2 : 3).map(category => (
-                                    <span
-                                      key={category.slug.current}
-                                      className="inline-block text-xs px-2 py-0.5 rounded-full"
-                                      style={{
-                                        backgroundColor: `${category.color || '#3b82f6'}15`,
-                                        color: category.color || '#3b82f6'
-                                      }}
-                                    >
-                                      {category.title}
-                                    </span>
-                                  ))}
-                                  {post.categories.length > (window.innerWidth < 640 ? 2 : 3) && (
-                                    <span className="inline-block text-xs text-gray-500 dark:text-gray-400">
-                                      +{post.categories.length - (window.innerWidth < 640 ? 2 : 3)}
-                                    </span>
-                                  )}
-                                </div>
+                                <CategoryList categories={post.categories} />
                               )}
                             </div>
                             

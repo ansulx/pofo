@@ -59,7 +59,8 @@ export const config = {
 export const corsOrigins = [
   'http://localhost:3000',
   'http://localhost:3333',
-  'https://yourdomain.com' // Replace with your production domain
+  'https://your-vercel-app.vercel.app', // Add your Vercel URL
+  'https://ansul.site' // If you have a custom domain
 ]
 
 // Configure CORS for your Sanity project via the management API
