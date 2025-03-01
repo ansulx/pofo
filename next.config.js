@@ -8,9 +8,16 @@ const nextConfig = {
         pathname: '**',
       },
     ],
+    domains: ['cdn.sanity.io'],
+    formats: ['image/avif', 'image/webp'],
   },
   experimental: {
     missingSuspenseWithCSRBailout: false,
+    esmExternals: 'loose',
+    serverComponentsExternalPackages: [
+      '@sanity/client',
+      '@sanity/image-url'
+    ],
   },
   async redirects() {
     return [
@@ -20,6 +27,20 @@ const nextConfig = {
         permanent: true,
       },
     ]
+  },
+  staticPageGenerationTimeout: 180,
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(js|jsx|ts|tsx)$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['next/babel'],
+        },
+      },
+    });
+    return config;
   },
 }
 

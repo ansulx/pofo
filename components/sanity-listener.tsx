@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useSanityListener } from '@/lib/hooks/useSanityListener';
+import { useEffect } from 'react';
 
 export default function SanityListener({ documentTypes = ['post', 'about', 'project', 'publication', 'category'] }) {
   const router = useRouter();

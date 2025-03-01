@@ -92,9 +92,27 @@ export default function ProjectsList({ initialProjects }: ProjectsListProps) {
 
   // Add similar real-time update functionality to the projects list
   const isListening = useSanityListener(['project'], (update) => {
+    // Create a reference to the correctly scoped function
+    const refreshData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/refresh-projects?t=${Date.now()}`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.projects) {
+            setProjects(result.projects);
+          }
+        }
+      } catch (err) {
+        console.error("Error refreshing projects:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
     if (update.transition === 'publish') {
       console.log('Project published, refreshing data...');
-      fetchLatestProjects(true);
+      refreshData();
     }
   });
 

@@ -47,7 +47,7 @@ export function useSanityListener(
         }, 5000);
       };
       
-      eventSource.addEventListener('mutation', async (event) => {
+      eventSource.addEventListener('mutation', async (event: MessageEvent<string>) => {
         try {
           const data = JSON.parse(event.data);
           console.log('Sanity content updated:', data);

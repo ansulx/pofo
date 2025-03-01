@@ -65,4 +65,26 @@ export interface Category {
     current: string;
   };
   color?: string;
-} 
+}
+
+// Add typing for the mutation event in SanityListener
+export interface SanityMutationEvent {
+  type: string;
+  documentId: string;
+  transition: 'update' | 'publish' | 'unpublish' | 'delete';
+  identity: string;
+  mutations: any[];
+  result: any;
+  previousRev?: string;
+  resultRev: string;
+  timestamp: string;
+}
+
+// Ensure ProjectRefresh API response is typed
+export interface ProjectRefreshResponse {
+  projects: Project[];
+  updatedAt: string;
+}
+
+// Properly type the fetchLatestProjects function
+export type RefreshProjectsFunction = (forceRefresh?: boolean) => Promise<void>; 

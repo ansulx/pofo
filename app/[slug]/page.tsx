@@ -6,6 +6,7 @@ import { PortableText } from '@portabletext/react';
 import { format, parseISO } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 
 // Add type definitions for the Portable Text components
 interface PortableTextImageType {
@@ -211,4 +212,9 @@ export default async function BlogPostPage({ params }: BlogPostParams) {
       </div>
     </article>
   );
-} 
+}
+
+// For example, if using a client component with window references
+const ClientSideComponent = dynamic(() => import('@/components/client-component'), {
+  ssr: false
+}); 
