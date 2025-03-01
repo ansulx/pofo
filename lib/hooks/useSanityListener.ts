@@ -12,15 +12,14 @@ export function useSanityListener(
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
-    // Setup the EventSource for Sanity's real-time listen API
+    // Safety check for required env vars
     const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
-    
     if (!projectId) {
-      console.error('Missing Sanity project ID for real-time updates');
+      console.error('Missing NEXT_PUBLIC_SANITY_PROJECT_ID environment variable');
       return;
     }
     
+    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
     const types = documentTypes.map(type => `type == "${type}"`).join(' || ');
     const query = `*[${types}]`;
     const url = `https://${projectId}.api.sanity.io/v2021-06-07/data/listen/${dataset}?query=${encodeURIComponent(query)}`;
@@ -49,11 +48,9 @@ export function useSanityListener(
       };
       
       eventSource.addEventListener('mutation', async (event) => {
-        const data = JSON.parse(event.data);
-        console.log('Sanity content updated:', data);
-        
-        // Call the update callback
         try {
+          const data = JSON.parse(event.data);
+          console.log('Sanity content updated:', data);
           await onUpdate();
         } catch (error) {
           console.error('Error handling Sanity update:', error);
@@ -61,7 +58,11 @@ export function useSanityListener(
       });
       
       const setupListener = () => {
-        eventSource = new EventSource(url);
+        try {
+          eventSource = new EventSource(url);
+        } catch (err) {
+          console.error('Failed to create EventSource:', err);
+        }
       };
       
       return () => {
